@@ -1,4 +1,3 @@
-from requests import get
 from operator import itemgetter
 from service import json_data
 from sqlalchemy.sql import select, and_
@@ -6,13 +5,13 @@ from sqlalchemy import MetaData, Table, Column, Text, Float, Integer, create_eng
 
 
 def lookup_card_id(conn, card):
-    query = select([card_table.c.id]).where(and_(card_table.c.artist==card.get("artist"),
-                                              card_table.c.type==card.get("type"),
-                                              card_table.c.name==card.get("name"),
-                                              card_table.c.imageName==card.get("imageName"),
-                                              card_table.c.rarity==card.get("rarity"),
-                                              card_table.c.layout==card.get("layout"),
-                                              card_table.c.set_code==card.get("set_code")))
+    query = select([card_table.c.id]).where(and_(card_table.c.artist == card.get("artist"),
+                                                 card_table.c.type == card.get("type"),
+                                                 card_table.c.name == card.get("name"),
+                                                 card_table.c.imageName == card.get("imageName"),
+                                                 card_table.c.rarity == card.get("rarity"),
+                                                 card_table.c.layout == card.get("layout"),
+                                                 card_table.c.set_code == card.get("set_code")))
 
     card_rec_id, *_ = conn.execute(query).fetchone()
     return card_rec_id
@@ -24,7 +23,8 @@ def populate_set_table(eng):
     getter = itemgetter(*"code name border releaseDate type".split())
     for key, val in json_data.items():
         code, name, border, releaseDate, type = getter(val)
-        conn.execute( card_set_table.insert().values(code=code, name=name, border=border, releaseDate=releaseDate,type=type))
+        conn.execute(card_set_table.insert().values(code=code, name=name, border=border,
+                                                    releaseDate=releaseDate, type=type))
 
 
 def populate_card_table(eng, all_cards):
@@ -32,7 +32,9 @@ def populate_card_table(eng, all_cards):
     getter = itemgetter(*"artist type name imageName rarity layout set_code".split())
     for card in all_cards:
         artist, type, name, imageName, rarity, layout, set_code = getter(card)
-        query = card_table.insert().values(artist=artist, type=type, name=name, imageName=imageName, rarity=rarity, layout=layout, set_code=set_code)
+        query = card_table.insert().values(artist=artist, type=type, name=name,
+                                           imageName=imageName, rarity=rarity,
+                                           layout=layout, set_code=set_code)
         conn.execute(query)
 
 
@@ -48,7 +50,6 @@ def populate_strength_table(eng):
 
 
 def populate_text_table(eng):
-    from service import json_data
     conn = eng.connect()
 
     print("populating text table now")
@@ -56,6 +57,7 @@ def populate_text_table(eng):
         card_id = lookup_card_id(conn, card)
         conn.execute(text_table.insert().values(id=card_id, text=card.get("text")))
         print("added card id: {} with text: {}".format(card_id, card.get("text")))
+
 
 def populate_loyalty_table(eng):
     conn = eng.connect()
@@ -75,13 +77,14 @@ def populate_mana_table(eng):
         card_id = lookup_card_id(conn, card)
         conn.execute(mana_table.insert().values(id=card_id, manaCost=manaCost, cmc=cmc))
 
+
 def populate_color_table(eng):
     conn = eng.connect()
 
     for card in cards_by_attr("colors"):
         card_id = lookup_card_id(conn, card)
         for color in card.get("colors"):
-            conn.execute(color_table.insert().values(color_name=color , card_id=card_id))
+            conn.execute(color_table.insert().values(color_name=color, card_id=card_id))
 
 
 if __name__ == '__main__':
@@ -131,17 +134,21 @@ if __name__ == '__main__':
 
     def generate_abridged_set():
         getter = itemgetter(*"artist type name imageName rarity layout".split())
-        for set_code,v in json_data.items():
+        for set_code, v in json_data.items():
             for card in v.get("cards"):
                 artist, type, name, imageName, rarity, layout = getter(card)
-                new_card = {"artist":artist, "type":type, "name":name, "imageName":imageName, "rarity":rarity, "layout":layout, "set_code":set_code}
+                new_card = {"artist": artist, "type": type, "name": name,
+                            "imageName": imageName, "rarity": rarity, "layout": layout,
+                            "set_code": set_code}
                 yield new_card
 
     def generate_abridged_index_set(eng):
         new_card_set = []
         db_recs = eng.connect().execute(select([card_table])).fetchall()
         for id, artist, type, name, imageName, rarity, layout, set_code in db_recs:
-            new_card = {"id":id, "artist":artist, "type":type, "name":name, "imageName":imageName, "rarity":rarity, "layout":layout, "set_code":set_code}
+            new_card = {"id": id, "artist": artist, "type": type,
+                        "name": name, "imageName": imageName, "rarity": rarity,
+                        "layout": layout, "set_code": set_code}
             new_card_set.append(new_card)
         return new_card_set
 
