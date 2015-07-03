@@ -58,9 +58,9 @@ color_table = db.Table("color",
                     db.Column("color_name", db.Text),
                     db.Column("card_id", db.Integer, db.ForeignKey("card.id")))
 
-text_table = db.Table("db.Text", 
+text_table = db.Table("text",
                    db.Column("id", db.Integer, db.ForeignKey("card.id"), primary_key=True),
-                   db.Column("db.Text", db.Text))
+                   db.Column("text", db.Text))
 
 loyalty_table = db.Table("loyalty", 
                       db.Column("id", db.Integer, db.ForeignKey("card.id"), primary_key=True),
@@ -134,7 +134,19 @@ def get_color_info():
                   for rec_id, color_name, card_id in res]
     return jsonify({"results":final_list})
 
+@app.route("/text")
+def get_text_info():
+    json_data = request.get_json()
+    text_arg = json_data.get("text")
+    query = db.select([text_table])
+    query = query.where(text_table.c.text.like("%{}%".format(text_arg)))
+    print(query)
+    res = __runquery(query)
+    res = res.fetchall()
+    final_list = [dict(card_id=card_id, text=text)
+                  for card_id, text in res]
+    return jsonify({"results":final_list})
+
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
-
