@@ -21,9 +21,10 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://{}:{}@localhost/{}?char
 db = SQLAlchemy(app)
 
 
-def __connect():
-    return db.get_engine(app).connect()
-
+def __runquery(query):
+    conn = db.get_engine(app).connect()
+    res = conn.execute(query)
+    return res
 
 card_set_table = db.Table("card_set",
                        db.Column("code", db.VARCHAR(10), primary_key=True),
@@ -67,9 +68,8 @@ loyalty_table = db.Table("loyalty",
 
 @app.route("/card/<card_id>")
 def get_card(card_id):
-    conn = __connect()
     query = db.select([card_table]).where(card_table.c.id == card_id)
-    data_set = conn.execute(query).fetchall()
+    data_set = __runquery(query).fetchall()
     return_result = {}
     if len(data_set) == 1:
         id, artist, type, name, imageName, rarity, layout, set_code = data_set[0]
@@ -83,7 +83,6 @@ def get_card(card_id):
 
 @app.route("/strength")
 def search_strength():
-    conn = __connect()
     power = request.get_json().get("power")
     toughness = request.get_json().get("toughness")
     clause_list = list()
@@ -95,10 +94,10 @@ def search_strength():
     if toughness:
         query = query.where(strength_table.c.toughness == toughness)
 
-    data = list(conn.execute(query).fetchall())
+    data = list(__runquery(query).fetchall())
     data_set = [dict(id=id, power=power, toughness=toughness) for id, power, toughness in data]
     return jsonify({"results":data_set})
-    
+
 
 if __name__ == '__main__':
     db.create_all()
