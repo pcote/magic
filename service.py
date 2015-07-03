@@ -60,6 +60,21 @@ loyalty_table = db.Table("loyalty",
                       db.Column("id", db.Integer, db.ForeignKey("card.id"), primary_key=True),
                       db.Column("loyalty", db.Integer))
 
+@app.route("/card/<card_id>")
+def get_card(card_id):
+    conn = db.get_engine(app).connect()
+    query = db.select([card_table]).where(card_table.c.id == card_id)
+    data_set = conn.execute(query).fetchall()
+    return_result = {}
+    if len(data_set) == 1:
+        id, artist, type, name, imageName, rarity, layout, set_code = data_set[0]
+        card = dict(id=id, artist=artist, type=type, name=name, imageName=imageName, rarity=rarity, layout=layout, set_code=set_code)
+        return_result["result"] = card
+    else:
+        return_result["error"] = "card not found"
+
+    return jsonify(return_result)
+
 
 @app.route("/strength")
 def search_strength():
