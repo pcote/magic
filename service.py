@@ -121,6 +121,19 @@ def get_loyalty_info(loyalty_num):
                   for card_id, loyalty in res]
     return jsonify({"results":final_list})
 
+
+@app.route("/color")
+def get_color_info():
+    json_data = request.get_json()
+    color_arg = json_data.get("color")
+    query = db.select([color_table])
+    query = query.where(color_table.c.color_name == color_arg)
+    res = __runquery(query)
+    res = res.fetchall()
+    final_list = [dict(color_name=color_name, card_id=card_id)
+                  for rec_id, color_name, card_id in res]
+    return jsonify({"results":final_list})
+
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
