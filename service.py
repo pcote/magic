@@ -20,6 +20,11 @@ db = parser.get("mysql", "db")
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://{}:{}@localhost/{}?charset=utf8".format(user, pw, db)
 db = SQLAlchemy(app)
 
+
+def __connect():
+    return db.get_engine(app).connect()
+
+
 card_set_table = db.Table("card_set",
                        db.Column("code", db.VARCHAR(10), primary_key=True),
                        db.Column("name", db.Text),
@@ -62,7 +67,7 @@ loyalty_table = db.Table("loyalty",
 
 @app.route("/card/<card_id>")
 def get_card(card_id):
-    conn = db.get_engine(app).connect()
+    conn = __connect()
     query = db.select([card_table]).where(card_table.c.id == card_id)
     data_set = conn.execute(query).fetchall()
     return_result = {}
@@ -78,7 +83,7 @@ def get_card(card_id):
 
 @app.route("/strength")
 def search_strength():
-    conn = db.get_engine(app).connect()
+    conn = __connect()
     power = request.get_json().get("power")
     toughness = request.get_json().get("toughness")
     clause_list = list()
