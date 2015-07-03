@@ -111,6 +111,16 @@ def get_set_info(s_code):
     return jsonify({"results":set_info})
 
 
+@app.route("/loyalty/<loyalty_num>")
+def get_loyalty_info(loyalty_num):
+    query = db.select([loyalty_table])
+    query = query.where(loyalty_table.c.loyalty == loyalty_num)
+    res = __runquery(query)
+    res = res.fetchall()
+    final_list = [dict(card_id=card_id, loyalty=loyalty)
+                  for card_id, loyalty in res]
+    return jsonify({"results":final_list})
+
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
