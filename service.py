@@ -99,6 +99,18 @@ def search_strength():
     return jsonify({"results":data_set})
 
 
+@app.route("/setinfo/<s_code>")
+def get_set_info(s_code):
+    query = db.select([card_set_table])
+    query = query.where(card_set_table.c.code == s_code)
+    res = __runquery(query).fetchone()
+    code, name, border, releaseDate, type = res
+    set_info =  dict(code=code, name=name, border=border,
+                     releaseDate=releaseDate, type=type)
+
+    return jsonify({"results":set_info})
+
+
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
