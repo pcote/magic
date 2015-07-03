@@ -2,7 +2,7 @@ from operator import itemgetter
 from service import json_data
 from sqlalchemy.sql import select, and_
 from sqlalchemy import MetaData, Table, Column, Text, Float, Integer, create_engine, VARCHAR, ForeignKey
-
+from configparser import ConfigParser
 
 def lookup_card_id(conn, card):
     query = select([card_table.c.id]).where(and_(card_table.c.artist == card.get("artist"),
@@ -88,7 +88,11 @@ def populate_color_table(eng):
 
 
 if __name__ == '__main__':
-    user_name, password, db_name = "", "", ""
+    parser = ConfigParser()
+    parser.read("creds.ini")
+    user_name  = parser.get("mysql", "user")
+    password = parser.get("mysql", "pw")
+    db_name = parser.get("mysql", "db")
     url_template = "mysql+pymysql://{}:{}@localhost/{}?charset=utf8"
     url = url_template.format(user_name, password, db_name)
     meta = MetaData()
