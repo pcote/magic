@@ -39,4 +39,17 @@ def get_tables(db):
                           db.Column("id", db.Integer, db.ForeignKey("card.id"), primary_key=True),
                           db.Column("loyalty", db.Integer))
 
-    return card_set_table, card_table, strength_table, mana_table, color_table, text_table, loyalty_table
+    deck_table = db.Table("deck",
+                      db.Column("id", db.Integer, primary_key=True, autoincrement=True),
+                      db.Column("name", db.Text),
+                      db.Column("owner", db.VARCHAR(50), db.ForeignKey("user.id")))
+
+    user_table = db.Table("user",
+                          db.Column("id", db.VARCHAR(50), primary_key=True))
+
+    card_deck_table = db.Table("card_deck",
+                               db.Column("id", db.Integer, primary_key=True),
+                               db.Column("deck_id", db.Integer, db.ForeignKey("deck.id")),
+                               db.Column("card_id", db.Integer, db.ForeignKey("card.id")))
+
+    return card_set_table, card_table, strength_table, mana_table, color_table, text_table, loyalty_table, user_table, deck_table, card_deck_table

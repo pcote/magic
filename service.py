@@ -28,7 +28,7 @@ def __runquery(query):
     return res
 
 
-card_set_table, card_table, strength_table, mana_table, color_table, text_table, loyalty_table = tabledefs.get_tables(db)
+card_set_table, card_table, strength_table, mana_table, color_table, text_table, loyalty_table, user_table, deck_table, card_deck_table = tabledefs.get_tables(db)
 
 
 @app.route("/card/<card_id>")

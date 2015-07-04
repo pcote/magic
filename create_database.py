@@ -1,5 +1,5 @@
 from operator import itemgetter
-from service import json_data
+# from service import json_data
 from sqlalchemy.sql import select, and_
 from sqlalchemy import MetaData, Table, Column, Text, Float, Integer, create_engine, VARCHAR, ForeignKey
 from configparser import ConfigParser
@@ -136,6 +136,21 @@ if __name__ == '__main__':
                           Column("id", Integer, ForeignKey("card.id"), primary_key=True),
                           Column("loyalty", Integer))
 
+    user_table = Table("user", meta,
+                          Column("id", VARCHAR(50), primary_key=True))
+
+    deck_table = Table("deck", meta,
+                  Column("id", Integer, primary_key=True, autoincrement=True),
+                  Column("name", Text),
+                  Column("owner", VARCHAR(50), ForeignKey("user.id")))
+
+
+    card_deck_table = Table("card_deck", meta,
+                               Column("id", Integer, primary_key=True, autoincrement=True),
+                               Column("deck_id", Integer, ForeignKey("deck.id")),
+                               Column("card_id", Integer, ForeignKey("card.id")))
+
+
     def generate_abridged_set():
         getter = itemgetter(*"artist type name imageName rarity layout".split())
         for set_code, v in json_data.items():
@@ -167,7 +182,7 @@ if __name__ == '__main__':
     eng = create_engine(url)
     meta.create_all(eng)
     conn = eng.connect()
-
+    """
     populate_set_table(eng)
     print("finished populating set table")
     populate_card_table(eng, generate_abridged_set())
@@ -182,3 +197,4 @@ if __name__ == '__main__':
     print("finished populating loyalty table")
     populate_text_table(eng)
     print("finished populating text table")
+    """
