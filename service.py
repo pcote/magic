@@ -136,6 +136,15 @@ def list_decks():
     deck_list = [dict(id=id, name=name, owner=owner) for id, name, owner in res.fetchall()]
     return jsonify({"results":deck_list})
 
+@app.route("/addcard", methods=["POST"])
+def add_card():
+    deck_id = __json_arg("deck_id")
+    card_id = __json_arg("card_id")
+    __runquery(card_deck_table.insert().values(deck_id=deck_id, card_id=card_id))
+    msg = "Card number: {} added to deck number: {}".format(card_id, deck_id)
+    return jsonify({"message":msg})
+
+
 
 if __name__ == '__main__':
     db.create_all()
