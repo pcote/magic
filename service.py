@@ -156,6 +156,16 @@ def delete_card():
     return jsonify({"message":msg})
 
 
+@app.route("/listcardsindeck", methods=["GET"])
+def list_cards_in_deck():
+    deck_id = __json_arg("deck_id")
+    query = db.select([card_deck_table])
+    query = query.where(card_deck_table.c.deck_id == deck_id)
+    results = __runquery(query)
+    final_list = [dict(id=id, deck_id=deck_id, card_id=card_id)
+                  for id, deck_id, card_id in results.fetchall()]
+    return jsonify({"results":final_list})
+
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
