@@ -129,6 +129,14 @@ def add_deck():
     return jsonify({"message":"Deck {} createed under the owner {}".format(deck_name, owner)})
 
 
+@app.route("/listdecks", methods=["GET"])
+def list_decks():
+    owner = __json_arg("owner")
+    res = __runquery(db.select([deck_table]).where(deck_table.c.owner == owner))
+    deck_list = [dict(id=id, name=name, owner=owner) for id, name, owner in res.fetchall()]
+    return jsonify({"results":deck_list})
+
+
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
