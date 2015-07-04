@@ -144,6 +144,16 @@ def add_card():
     msg = "Card number: {} added to deck number: {}".format(card_id, deck_id)
     return jsonify({"message":msg})
 
+@app.route("/deletecard", methods=["DELETE"])
+def delete_card():
+    deck_id = __json_arg("deck_id")
+    card_id = __json_arg("card_id")
+    query = card_deck_table.delete()
+    query = query.where(card_deck_table.c.deck_id == deck_id)
+    query = query.where(card_deck_table.c.card_id == card_id)
+    __runquery(query)
+    msg = "Ran delete query on card: {} in deck: {}".format(card_id, deck_id)
+    return jsonify({"message":msg})
 
 
 if __name__ == '__main__':
