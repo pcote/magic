@@ -112,6 +112,16 @@ def get_text_info():
                   for card_id, text in res]
     return jsonify({"results":final_list})
 
+
+@app.route("/adduser", methods=["POST"])
+def add_user():
+    json_data = request.get_json()
+    user_name = json_data.get("user_name")
+    query = user_table.insert().values(id=user_name)
+    __runquery(query)
+    return jsonify({"message":"add user query completed for user: {}".format(user_name)})
+
+
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
