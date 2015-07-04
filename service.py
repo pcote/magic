@@ -121,6 +121,14 @@ def add_user():
     return jsonify({"message":"add user query completed for user: {}".format(user_name)})
 
 
+@app.route("/adddeck", methods=["POST"])
+def add_deck():
+    deck_name = __json_arg("deck_name")
+    owner = __json_arg("owner")
+    __runquery(deck_table.insert().values(name=deck_name, owner=owner))
+    return jsonify({"message":"Deck {} createed under the owner {}".format(deck_name, owner)})
+
+
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
