@@ -27,6 +27,8 @@ def __runquery(query):
     res = conn.execute(query)
     return res
 
+def __json_arg(arg):
+    return request.get_json().get(arg)
 
 card_set_table, card_table, strength_table, mana_table, color_table, text_table, loyalty_table, user_table, deck_table, card_deck_table = tabledefs.get_tables(db)
 
@@ -48,8 +50,8 @@ def get_card(card_id):
 
 @app.route("/strength")
 def search_strength():
-    power = request.get_json().get("power")
-    toughness = request.get_json().get("toughness")
+    power = __json_arg("power")
+    toughness = __json_arg("toughness")
     clause_list = list()
     clause_list.append(strength_table.c.power == power)
 
@@ -89,8 +91,7 @@ def get_loyalty_info(loyalty_num):
 
 @app.route("/color")
 def get_color_info():
-    json_data = request.get_json()
-    color_arg = json_data.get("color")
+    color_arg = __json_arg("color")
     query = db.select([color_table])
     query = query.where(color_table.c.color_name == color_arg)
     res = __runquery(query)
@@ -101,8 +102,7 @@ def get_color_info():
 
 @app.route("/text")
 def get_text_info():
-    json_data = request.get_json()
-    text_arg = json_data.get("text")
+    text_arg = __json_arg("text")
     query = db.select([text_table])
     query = query.where(text_table.c.text.like("%{}%".format(text_arg)))
     print(query)
@@ -115,8 +115,7 @@ def get_text_info():
 
 @app.route("/adduser", methods=["POST"])
 def add_user():
-    json_data = request.get_json()
-    user_name = json_data.get("user_name")
+    user_name = __json_arg("user_name")
     query = user_table.insert().values(id=user_name)
     __runquery(query)
     return jsonify({"message":"add user query completed for user: {}".format(user_name)})
