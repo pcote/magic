@@ -41,7 +41,7 @@ def get_card(card_id):
     if len(data_set) == 1:
         id, artist, type, name, imageName, rarity, layout, set_code = data_set[0]
         card = dict(id=id, artist=artist, type=type, name=name, imageName=imageName, rarity=rarity, layout=layout, set_code=set_code)
-        return_result["result"] = card
+        return_result["results"] = card
     else:
         return_result["error"] = "card not found"
 
