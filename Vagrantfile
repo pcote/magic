@@ -67,7 +67,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
      sudo apt-get update
      sudo apt-get install -y nginx
-     #sudo cp /ect/nginx/nginx.conf /etc/nginx/nginx.old
+     sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.old
      sudo cp /vagrant/nginx.conf /etc/nginx/nginx.conf
      sudo apt-get install -y build-essential
      sudo apt-get install -y python3-dev
@@ -80,7 +80,7 @@ Vagrant.configure(2) do |config|
      make
      make test
      sudo make install
-     sudo pip3.4 install -r requirements.txt
+     sudo pip3.4 install -r /vagrant/requirements.txt
      sudo apt-get install -y fail2ban
      sudo cp /vagrant/jail.local /etc/fail2ban/jail.local
      # note: for now, ufw will need to be enabled manually.
