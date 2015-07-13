@@ -66,10 +66,8 @@ Vagrant.configure(2) do |config|
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
      sudo apt-get update
-     sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password temporary_password'
-     sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password temporary_password'
-     sudo apt-get install -y mysql-server
      sudo apt-get install -y nginx
+     #sudo cp /ect/nginx/nginx.conf /etc/nginx/nginx.old
      sudo cp /vagrant/nginx.conf /etc/nginx/nginx.conf
      sudo apt-get install -y build-essential
      sudo apt-get install -y python3-dev
@@ -89,7 +87,6 @@ Vagrant.configure(2) do |config|
      sudo ufw allow 80
      sudo ufw allow 3306
      sudo ufw allow 22
-
-     sudo app-get install -y git
+     sudo apt-get install -y git
   SHELL
 end
