@@ -9,12 +9,12 @@ import tabledefs
 
 # ATTENTION: AllSets-x.json is a file resource that needs to be downloaded.
 # Find it here: http://mtgjson.com/
-json_data = json.load(open("AllSets-x.json", "rt", encoding="utf-8"))
+json_data = json.load(open("/vagrant/AllSets-x.json", "rt", encoding="utf-8"))
 
 app = Flask(__name__)
 
 parser = ConfigParser()
-parser.read("creds.ini")
+parser.read("/vagrant/creds.ini")
 user = parser.get("mysql", "user")
 pw = parser.get("mysql", "pw")
 db = parser.get("mysql", "db")

@@ -88,5 +88,12 @@ Vagrant.configure(2) do |config|
      sudo ufw allow 3306
      sudo ufw allow 22
      sudo apt-get install -y git
+
+     sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password temporary_password'
+     sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password temporary_password'
+     sudo apt-get install -y mysql-server
+     mysql --user=root --password=temporary_password < /vagrant/db_setup.sql
+     python3 /vagrant/create_database.py
+
   SHELL
 end

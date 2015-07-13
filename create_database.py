@@ -46,17 +46,13 @@ def populate_strength_table(eng):
         card_rec_id = lookup_card_id(conn, card)
         power, toughness = itemgetter(*"power toughness".split())(card)
         conn.execute(strength_table.insert().values(id=card_rec_id, power=power, toughness=toughness))
-        print("added id: {} with power: {} and toughness: {}".format(card_rec_id, power, toughness))
 
 
 def populate_text_table(eng):
     conn = eng.connect()
-
-    print("populating text table now")
     for card in cards_by_attr("text"):
         card_id = lookup_card_id(conn, card)
         conn.execute(text_table.insert().values(id=card_id, text=card.get("text")))
-        print("added card id: {} with text: {}".format(card_id, card.get("text")))
 
 
 def populate_loyalty_table(eng):
@@ -65,8 +61,6 @@ def populate_loyalty_table(eng):
     for card in cards_by_attr("loyalty"):
         card_id = lookup_card_id(conn, card)
         conn.execute(loyalty_table.insert().values(id=card_id, loyalty=card.get("loyalty")))
-
-    print("okay done populating dem planeswalkers")
 
 
 def populate_mana_table(eng):
@@ -89,7 +83,7 @@ def populate_color_table(eng):
 
 if __name__ == '__main__':
     parser = ConfigParser()
-    parser.read("creds.ini")
+    parser.read("/vagrant/creds.ini")
     user_name  = parser.get("mysql", "user")
     password = parser.get("mysql", "pw")
     db_name = parser.get("mysql", "db")
@@ -152,6 +146,7 @@ if __name__ == '__main__':
 
 
     def generate_abridged_set():
+        from service import json_data
         getter = itemgetter(*"artist type name imageName rarity layout".split())
         for set_code, v in json_data.items():
             for card in v.get("cards"):
@@ -182,7 +177,6 @@ if __name__ == '__main__':
     eng = create_engine(url)
     meta.create_all(eng)
     conn = eng.connect()
-    """
     populate_set_table(eng)
     print("finished populating set table")
     populate_card_table(eng, generate_abridged_set())
@@ -197,4 +191,3 @@ if __name__ == '__main__':
     print("finished populating loyalty table")
     populate_text_table(eng)
     print("finished populating text table")
-    """
