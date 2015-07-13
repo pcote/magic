@@ -23,7 +23,7 @@ Vagrant.configure(2) do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # config.vm.network "forwarded_port", guest: 80, host: 8080
-
+  config.vm.network "forwarded_port", guest:80, host: 80
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
   # config.vm.network "private_network", ip: "192.168.33.10"
@@ -65,35 +65,53 @@ Vagrant.configure(2) do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
-     sudo apt-get update
-     sudo apt-get install -y nginx
-     sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.old
-     sudo cp /vagrant/nginx.conf /etc/nginx/nginx.conf
-     sudo apt-get install -y build-essential
-     sudo apt-get install -y python3-dev
-     sudo apt-get install -y libssl-dev
-     sudo apt-get install -y openssl
-     wget https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz
-     tar -xvf Python-3.4.3.tgz
-     cd Python-3.4.3/
-     ./configure
-     make
-     make test
-     sudo make install
-     sudo pip3.4 install -r /vagrant/requirements.txt
-     sudo apt-get install -y fail2ban
-     sudo cp /vagrant/jail.local /etc/fail2ban/jail.local
-     # note: for now, ufw will need to be enabled manually.
-     sudo ufw allow 80
-     sudo ufw allow 3306
-     sudo ufw allow 22
-     sudo apt-get install -y git
+     function setup_web_server(){
+         sudo apt-get update
+         sudo apt-get install -y nginx
+         sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.old
+         sudo cp /vagrant/nginx.conf /etc/nginx/nginx.conf
+         sudo apt-get install -y build-essential
+         sudo apt-get install -y python3-dev
+         sudo apt-get install -y libssl-dev
+         sudo apt-get install -y openssl
+     }
 
-     sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password temporary_password'
-     sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password temporary_password'
-     sudo apt-get install -y mysql-server
-     mysql --user=root --password=temporary_password < /vagrant/db_setup.sql
-     python3 /vagrant/create_database.py
+     function setup_python(){
+         wget https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz
+         tar -xvf Python-3.4.3.tgz
+         cd Python-3.4.3/
+         ./configure
+         make
+         make test
+         sudo make install
+         sudo pip3.4 install -r /vagrant/requirements.txt
+     }
 
+     function setup_security(){
+         sudo apt-get install -y fail2ban
+         sudo cp /vagrant/jail.local /etc/fail2ban/jail.local
+         # note: for now, ufw will need to be enabled manually.
+         sudo ufw allow 80
+         sudo ufw allow 3306
+         sudo ufw allow 22
+     }
+
+     function setup_git(){
+        sudo apt-get install -y git
+     }
+
+     function setup_database(){
+         sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password temporary_password'
+         sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password temporary_password'
+         sudo apt-get install -y mysql-server
+         mysql --user=root --password=temporary_password < /vagrant/db_setup.sql
+         python3 /vagrant/create_database.py
+     }
+
+     function start_web_service(){
+        sudo uwsgi --http-socket 127.0.0.1:9000 --wsgi-file /vagrant/service.py --callable app
+     }
+
+     start_web_service
   SHELL
 end
