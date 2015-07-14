@@ -105,8 +105,9 @@ Vagrant.configure(2) do |config|
          sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password temporary_password'
          sudo apt-get install -y mysql-server
          mysql --user=root --password=temporary_password < /vagrant/db_setup.sql
-         # TODO: script for populating databas currently broken.
-         # python3 /vagrant/create_database.py
+         cd /vagrant
+         python3 ./create_database.py
+         cd
      }
 
      function start_web_service(){
@@ -118,7 +119,7 @@ Vagrant.configure(2) do |config|
      setup_python
      setup_security
      setup_git
-     #setup_database
+     setup_database
      #start_web_service
   SHELL
 end
