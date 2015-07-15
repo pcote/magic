@@ -113,7 +113,7 @@ Vagrant.configure(2) do |config|
      function start_web_service(){
 	    cd /vagrant
 	    sudo service nginx restart
-        sudo uwsgi --http-socket 127.0.0.1:9000 --wsgi-file ./service.py --callable app --logto /vagrant/uwsgilog.log
+        uwsgi --http-socket 127.0.0.1:9000 --wsgi-file ./service.py --callable app --logto /vagrant/uwsgilog.log
      }
 
      setup_web_server
