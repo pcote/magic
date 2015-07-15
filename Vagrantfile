@@ -23,7 +23,7 @@ Vagrant.configure(2) do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # config.vm.network "forwarded_port", guest: 80, host: 8080
-  config.vm.network "forwarded_port", guest:80, host: 80
+    config.vm.network "forwarded_port", guest: 80, host: 80
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
   # config.vm.network "private_network", ip: "192.168.33.10"
@@ -111,8 +111,9 @@ Vagrant.configure(2) do |config|
      }
 
      function start_web_service(){
-        # TODO: This is broken for reasons not yet established as to why.  Do not use
-        sudo uwsgi --http-socket 127.0.0.1:9000 --wsgi-file /vagrant/service.py --callable app
+	    cd /vagrant
+	    sudo service nginx restart
+        sudo uwsgi --http-socket 127.0.0.1:9000 --wsgi-file ./service.py --callable app --logto /vagrant/uwsgilog.log
      }
 
      setup_web_server
@@ -120,6 +121,6 @@ Vagrant.configure(2) do |config|
      setup_security
      setup_git
      setup_database
-     #start_web_service
+     start_web_service
   SHELL
 end
