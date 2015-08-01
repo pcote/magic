@@ -83,7 +83,7 @@ def populate_color_table(eng):
 
 if __name__ == '__main__':
     parser = ConfigParser()
-    parser.read("/vagrant/creds.ini")
+    parser.read("creds.ini")
     user_name  = parser.get("mysql", "user")
     password = parser.get("mysql", "pw")
     db_name = parser.get("mysql", "db")
