@@ -130,20 +130,6 @@ if __name__ == '__main__':
                           Column("id", Integer, ForeignKey("card.id"), primary_key=True),
                           Column("loyalty", Integer))
 
-    user_table = Table("user", meta,
-                          Column("id", VARCHAR(50), primary_key=True))
-
-    deck_table = Table("deck", meta,
-                  Column("id", Integer, primary_key=True, autoincrement=True),
-                  Column("name", Text),
-                  Column("owner", VARCHAR(50), ForeignKey("user.id")))
-
-
-    card_deck_table = Table("card_deck", meta,
-                               Column("id", Integer, primary_key=True, autoincrement=True),
-                               Column("deck_id", Integer, ForeignKey("deck.id")),
-                               Column("card_id", Integer, ForeignKey("card.id")))
-
 
     def generate_abridged_set():
         from service import json_data

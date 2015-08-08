@@ -7,14 +7,12 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from configparser import ConfigParser
 import tabledefs
 
-# ATTENTION: AllSets-x.json is a file resource that needs to be downloaded.
-# Find it here: http://mtgjson.com/
-json_data = json.load(open("/vagrant/AllSets-x.json", "rt", encoding="utf-8"))
+
 
 app = Flask(__name__)
 
 parser = ConfigParser()
-parser.read("/vagrant/creds.ini")
+parser.read("./creds.ini")
 user = parser.get("mysql", "user")
 pw = parser.get("mysql", "pw")
 db = parser.get("mysql", "db")
@@ -30,7 +28,7 @@ def __runquery(query):
 def __json_arg(arg):
     return request.get_json().get(arg)
 
-card_set_table, card_table, strength_table, mana_table, color_table, text_table, loyalty_table, user_table, deck_table, card_deck_table = tabledefs.get_tables(db)
+card_set_table, card_table, strength_table, mana_table, color_table, text_table, loyalty_table  = tabledefs.get_tables(db)
 
 
 @app.route("/card/<card_id>")
@@ -112,59 +110,6 @@ def get_text_info():
                   for card_id, text in res]
     return jsonify({"results":final_list})
 
-
-@app.route("/adduser", methods=["POST"])
-def add_user():
-    user_name = __json_arg("user_name")
-    query = user_table.insert().values(id=user_name)
-    __runquery(query)
-    return jsonify({"message":"add user query completed for user: {}".format(user_name)})
-
-
-@app.route("/adddeck", methods=["POST"])
-def add_deck():
-    deck_name = __json_arg("deck_name")
-    owner = __json_arg("owner")
-    __runquery(deck_table.insert().values(name=deck_name, owner=owner))
-    return jsonify({"message":"Deck {} createed under the owner {}".format(deck_name, owner)})
-
-
-@app.route("/listdecks", methods=["GET"])
-def list_decks():
-    owner = __json_arg("owner")
-    res = __runquery(db.select([deck_table]).where(deck_table.c.owner == owner))
-    deck_list = [dict(id=id, name=name, owner=owner) for id, name, owner in res.fetchall()]
-    return jsonify({"results":deck_list})
-
-@app.route("/addcard", methods=["POST"])
-def add_card():
-    deck_id = __json_arg("deck_id")
-    card_id = __json_arg("card_id")
-    __runquery(card_deck_table.insert().values(deck_id=deck_id, card_id=card_id))
-    msg = "Card number: {} added to deck number: {}".format(card_id, deck_id)
-    return jsonify({"message":msg})
-
-@app.route("/deletecard", methods=["DELETE"])
-def delete_card():
-    deck_id = __json_arg("deck_id")
-    card_id = __json_arg("card_id")
-    query = card_deck_table.delete()
-    query = query.where(card_deck_table.c.deck_id == deck_id)
-    query = query.where(card_deck_table.c.card_id == card_id)
-    __runquery(query)
-    msg = "Ran delete query on card: {} in deck: {}".format(card_id, deck_id)
-    return jsonify({"message":msg})
-
-
-@app.route("/listcardsindeck", methods=["GET"])
-def list_cards_in_deck():
-    deck_id = __json_arg("deck_id")
-    query = db.select([card_deck_table])
-    query = query.where(card_deck_table.c.deck_id == deck_id)
-    results = __runquery(query)
-    final_list = [dict(id=id, deck_id=deck_id, card_id=card_id)
-                  for id, deck_id, card_id in results.fetchall()]
-    return jsonify({"results":final_list})
 
 if __name__ == '__main__':
     db.create_all()

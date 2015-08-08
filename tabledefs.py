@@ -52,4 +52,4 @@ def get_tables(db):
                                db.Column("deck_id", db.Integer, db.ForeignKey("deck.id")),
                                db.Column("card_id", db.Integer, db.ForeignKey("card.id")))
 
-    return card_set_table, card_table, strength_table, mana_table, color_table, text_table, loyalty_table, user_table, deck_table, card_deck_table
+    return card_set_table, card_table, strength_table, mana_table, color_table, text_table, loyalty_table
