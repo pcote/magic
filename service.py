@@ -90,7 +90,8 @@ def get_loyalty_info(loyalty_num):
 
 @app.route("/color")
 def get_color_info():
-    color_arg = __json_arg("color")
+    color_arg = request.args.get("color")
+    color_arg = color_arg.title()
     query = db.select([color_table])
     query = query.where(color_table.c.color_name == color_arg)
     res = __runquery(query)
