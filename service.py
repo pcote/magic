@@ -102,7 +102,7 @@ def get_color_info():
 
 @app.route("/text")
 def get_text_info():
-    text_arg = __json_arg("text")
+    text_arg = request.args.get("text")
     query = db.select([text_table])
     query = query.where(text_table.c.text.like("%{}%".format(text_arg)))
     print(query)
