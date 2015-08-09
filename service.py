@@ -48,8 +48,9 @@ def get_card(card_id):
 
 @app.route("/strength")
 def search_strength():
-    power = __json_arg("power")
-    toughness = __json_arg("toughness")
+    power = request.args.get("power")
+    toughness = request.args.get("toughness")
+
     clause_list = list()
     clause_list.append(strength_table.c.power == power)
 
