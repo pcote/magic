@@ -61,7 +61,7 @@ def search_strength():
         query = query.where(strength_table.c.toughness == toughness)
 
     data = list(__runquery(query).fetchall())
-    data_set = [dict(id=id, power=power, toughness=toughness) for id, power, toughness in data]
+    data_set = [dict(card_id=id, power=power, toughness=toughness) for id, power, toughness in data]
     return jsonify({"results":data_set})
 
 
