@@ -48,6 +48,7 @@ def get_card(card_id):
 
 @app.route("/strength")
 def search_strength():
+
     power = request.args.get("power")
     toughness = request.args.get("toughness")
 
@@ -61,8 +62,9 @@ def search_strength():
         query = query.where(strength_table.c.toughness == toughness)
 
     data = list(__runquery(query).fetchall())
-    data_set = [dict(card_id=id, power=power, toughness=toughness) for id, power, toughness in data]
+    data_set = [dict(card_id=card_id, power=power, toughness=toughness) for card_id, power, toughness in data]
     return jsonify({"results":data_set})
+
 
 
 @app.route("/setinfo/<s_code>")
@@ -96,7 +98,7 @@ def get_color_info():
     query = query.where(color_table.c.color_name == color_arg)
     res = __runquery(query)
     res = res.fetchall()
-    final_list = [dict(color_name=color_name, card_id=card_id)
+    final_list = [dict(card_id=card_id, color_name=color_name)
                   for rec_id, color_name, card_id in res]
     return jsonify({"results":final_list})
 
