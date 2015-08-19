@@ -55,14 +55,15 @@ def search_strength():
     clause_list = list()
     clause_list.append(strength_table.c.power == power)
 
-    query = db.select([strength_table])
+    query = db.select([card_table.c.name, card_table.c.type, card_table.c.rarity, card_table.c.artist, card_set_table.c.name])
+    query = query.select_from(strength_table.join(card_table.join(card_set_table)))
     if power:
         query = query.where(strength_table.c.power == power)
     if toughness:
         query = query.where(strength_table.c.toughness == toughness)
 
     data = list(__runquery(query).fetchall())
-    data_set = [dict(card_id=card_id, power=power, toughness=toughness) for card_id, power, toughness in data]
+    data_set = [dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name) for name, type, rarity, artist, set_name in data]
     return jsonify({"results":data_set})
 
 
