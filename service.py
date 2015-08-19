@@ -82,38 +82,39 @@ def get_set_info(s_code):
 
 @app.route("/loyalty/<loyalty_num>")
 def get_loyalty_info(loyalty_num):
-    query = db.select([loyalty_table])
+    query = db.select([card_table.c.name, card_table.c.type, card_table.c.rarity, card_table.c.artist, card_set_table.c.name])
+    query = query.select_from(loyalty_table.join(card_table.join(card_set_table)))
     query = query.where(loyalty_table.c.loyalty == loyalty_num)
     res = __runquery(query)
     res = res.fetchall()
-    final_list = [dict(card_id=card_id, loyalty=loyalty)
-                  for card_id, loyalty in res]
-    return jsonify({"results":final_list})
+    data_set = [dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name) for name, type, rarity, artist, set_name in res]
+    return jsonify({"results":data_set})
 
 
 @app.route("/color")
 def get_color_info():
     color_arg = request.args.get("color")
     color_arg = color_arg.title()
-    query = db.select([color_table])
+    query = db.select([card_table.c.name, card_table.c.type, card_table.c.rarity, card_table.c.artist, card_set_table.c.name])
+    query = query.select_from(color_table.join(card_table.join(card_set_table)))
     query = query.where(color_table.c.color_name == color_arg)
     res = __runquery(query)
     res = res.fetchall()
-    final_list = [dict(card_id=card_id, color_name=color_name)
-                  for rec_id, color_name, card_id in res]
-    return jsonify({"results":final_list})
+    data_set = [dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name) for name, type, rarity, artist, set_name in res]
+    return jsonify({"results":data_set})
+
 
 @app.route("/text")
 def get_text_info():
     text_arg = request.args.get("text")
-    query = db.select([text_table])
+    query = db.select([card_table.c.name, card_table.c.type, card_table.c.rarity, card_table.c.artist, card_set_table.c.name])
+    query = query.select_from(text_table.join(card_table.join(card_set_table)))
     query = query.where(text_table.c.text.like("%{}%".format(text_arg)))
     print(query)
     res = __runquery(query)
     res = res.fetchall()
-    final_list = [dict(card_id=card_id, text=text)
-                  for card_id, text in res]
-    return jsonify({"results":final_list})
+    data_set = [dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name) for name, type, rarity, artist, set_name in res]
+    return jsonify({"results":data_set})
 
 
 if __name__ == '__main__':
