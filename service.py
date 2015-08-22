@@ -116,6 +116,56 @@ def get_text_info():
     data_set = [dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name) for name, type, rarity, artist, set_name in res]
     return jsonify({"results":data_set})
 
+@app.route("/getinfo")
+def get_info():
+    power = request.args.get("power")
+    toughness = request.args.get("toughness")
+    color = request.args.get("color")
+    loyalty = request.args.get("loyalty")
+    text = request.args.get("text")
+
+
+    # columns to work with
+    query = db.select([card_table.c.name, card_table.c.type, card_table.c.rarity, card_table.c.artist, card_set_table.c.name])
+
+    # build the join chain to select from (based on what was passed in.
+    join_chain = card_table
+    if power or toughness:
+        join_chain = join_chain.join(strength_table)
+    if color:
+        join_chain = join_chain.join(color_table)
+    if loyalty:
+        join_chain = join_chain.join(loyalty_table)
+    if text:
+        join_chain = join_chain.join(text_table)
+
+    query = query.select_from(join_chain)
+
+    # where clause step
+    where_clause_list = []
+    if power:
+        where_clause_list.append(strength_table.c.power == power)
+    if toughness:
+        where_clause_list.append(strength_table.c.toughness == toughness)
+    if color:
+        where_clause_list.append(color_table.c.color_name == color)
+    if loyalty:
+        where_clause_list.append(loyalty_table.c.loyalty == loyalty)
+    if text:
+        where_clause_list.append(text_table.c.text.like("%" + text + "%"))
+
+    if len(where_clause_list) > 1:
+        query = query.where(db.and_(*where_clause_list))
+    else:
+        query.where(where_clause_list[0])
+
+    res = __runquery(query)
+    res = res.fetchall()
+    data_set = [dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name) for name, type, rarity, artist, set_name in res]
+    return jsonify({"results":data_set})
+
+
+
 
 if __name__ == '__main__':
     db.create_all()
