@@ -159,11 +159,13 @@ def get_info():
     else:
         query.where(where_clause_list[0])
 
+    # prevent letting search results use up system memory
+    query = query.limit(1000)
+
     res = __runquery(query)
     res = res.fetchall()
     data_set = [dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name) for name, type, rarity, artist, set_name in res]
     return jsonify({"results":data_set})
-
 
 
 
