@@ -144,20 +144,15 @@ def get_info():
     # where clause step
     where_clause_list = []
     if power:
-        where_clause_list.append(strength_table.c.power == power)
+        query = query.where(strength_table.c.power == power)
     if toughness:
-        where_clause_list.append(strength_table.c.toughness == toughness)
+        query = query.where(strength_table.c.toughness == toughness)
     if color:
-        where_clause_list.append(color_table.c.color_name == color)
+        query = query.where(color_table.c.color_name == color)
     if loyalty:
-        where_clause_list.append(loyalty_table.c.loyalty == loyalty)
+        query = query.where(loyalty_table.c.loyalty == loyalty)
     if text:
-        where_clause_list.append(text_table.c.text.like("%" + text + "%"))
-
-    if len(where_clause_list) > 1:
-        query = query.where(db.and_(*where_clause_list))
-    else:
-        query.where(where_clause_list[0])
+        query = query.where(text_table.c.text.like("%" + text + "%"))
 
     # prevent letting search results use up system memory
     query = query.limit(1000)
