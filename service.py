@@ -37,7 +37,10 @@ def get_card(card_id):
     return_result = {}
     if len(data_set) == 1:
         id, artist, type, name, imageName, rarity, layout, set_code = data_set[0]
-        card = dict(card_id=id, artist=artist, type=type, name=name, imageName=imageName, rarity=rarity, layout=layout, set_code=set_code)
+        card = dict(card_id=id, artist=artist, type=type,
+                    name=name, imageName=imageName, rarity=rarity,
+                    layout=layout, set_code=set_code)
+
         return_result["results"] = card
     else:
         return_result["error"] = "card not found"
@@ -67,7 +70,8 @@ def get_info():
 
 
     # columns to work with
-    query = db.select([card_table.c.name, card_table.c.type, card_table.c.rarity, card_table.c.artist, card_set_table.c.name])
+    query = db.select([card_table.c.name, card_table.c.type, card_table.c.rarity,
+                       card_table.c.artist, card_set_table.c.name])
 
     # build the join chain to select from (based on what was passed in.
     join_chain = card_table
@@ -100,7 +104,8 @@ def get_info():
 
     res = __runquery(query)
     res = res.fetchall()
-    data_set = [dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name) for name, type, rarity, artist, set_name in res]
+    data_set = [dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name)
+                    for name, type, rarity, artist, set_name in res]
     return jsonify({"results":data_set})
 
 
