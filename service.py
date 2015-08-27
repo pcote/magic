@@ -1,7 +1,6 @@
 """
 Service for Magic the Gathering Data
 """
-import json
 from flask import Flask, jsonify, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from configparser import ConfigParser
@@ -24,10 +23,11 @@ def __runquery(query):
     res = conn.execute(query)
     return res
 
+
 def __json_arg(arg):
     return request.get_json().get(arg)
 
-card_set_table, card_table, strength_table, mana_table, color_table, text_table, loyalty_table  = tabledefs.get_tables(db)
+card_set_table, card_table, strength_table, mana_table, color_table, text_table, loyalty_table = tabledefs.get_tables(db)
 
 
 @app.route("/card/<card_id>")
@@ -36,9 +36,9 @@ def get_card(card_id):
     data_set = __runquery(query).fetchall()
     return_result = {}
     if len(data_set) == 1:
-        id, artist, type, name, imageName, rarity, layout, set_code = data_set[0]
+        id, artist, type, name, image_name, rarity, layout, set_code = data_set[0]
         card = dict(card_id=id, artist=artist, type=type,
-                    name=name, imageName=imageName, rarity=rarity,
+                    name=name, imageName=image_name, rarity=rarity,
                     layout=layout, set_code=set_code)
 
         return_result["results"] = card
@@ -53,11 +53,11 @@ def get_set_info(s_code):
     query = db.select([card_set_table])
     query = query.where(card_set_table.c.code == s_code)
     res = __runquery(query).fetchone()
-    code, name, border, releaseDate, type = res
-    set_info =  dict(code=code, name=name, border=border,
-                     releaseDate=releaseDate, type=type)
+    code, name, border, release_date, type = res
+    set_info = dict(code=code, name=name, border=border,
+                    releaseDate=release_date, type=type)
 
-    return jsonify({"results":set_info})
+    return jsonify({"results": set_info})
 
 
 @app.route("/getinfo")
@@ -67,7 +67,6 @@ def get_info():
     color = request.args.get("color")
     loyalty = request.args.get("loyalty")
     text = request.args.get("text")
-
 
     # columns to work with
     query = db.select([card_table.c.name, card_table.c.type, card_table.c.rarity,
@@ -86,8 +85,6 @@ def get_info():
 
     query = query.select_from(join_chain)
 
-    # where clause step
-    where_clause_list = []
     if power:
         query = query.where(strength_table.c.power == power)
     if toughness:
@@ -105,9 +102,8 @@ def get_info():
     res = __runquery(query)
     res = res.fetchall()
     data_set = [dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name)
-                    for name, type, rarity, artist, set_name in res]
-    return jsonify({"results":data_set})
-
+                for name, type, rarity, artist, set_name in res]
+    return jsonify({"results": data_set})
 
 
 if __name__ == '__main__':
