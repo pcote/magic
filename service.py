@@ -98,11 +98,14 @@ def get_info():
 
     # prevent letting search results use up system memory
     query = query.limit(1000)
-
+    app.logger.info(query)
     res = __runquery(query)
     res = res.fetchall()
+
     data_set = [dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name)
                 for name, type, rarity, artist, set_name in res]
+
+    app.logger.info("{} records retrieved.".format(len(data_set)))
     return jsonify({"results": data_set})
 
 
