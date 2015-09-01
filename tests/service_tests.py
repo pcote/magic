@@ -14,7 +14,7 @@ class WebServiceTests(unittest.TestCase):
         self.assertTrue(len(data_list) > 0, "There should be data in this list")
 
     def _get_data(self, arg):
-        url = "{}{}".format(self.base_url, "power=1")
+        url = "{}{}".format(self.base_url, arg)
         res = get(url)
         return res
 
@@ -37,7 +37,7 @@ class WebServiceTests(unittest.TestCase):
     def test_text(self):
         import requests.utils
         arg = requests.utils.quote("enters the battlefield")
-        res = self._get_data("loyalty={}".format(arg))
+        res = self._get_data("text={}".format(arg))
         self._general_tests(res)
 
     def tearDown(self):
