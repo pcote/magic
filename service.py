@@ -69,8 +69,19 @@ def get_info():
     text = request.args.get("text")
 
     # columns to work with
-    query = db.select([card_table.c.name, card_table.c.type, card_table.c.rarity,
-                       card_table.c.artist, card_set_table.c.name])
+    table_columns = [card_table.c.name, card_table.c.type, card_table.c.rarity,
+                       card_table.c.artist, card_set_table.c.name]
+
+    if power or toughness:
+        table_columns.extend([strength_table.c.power, strength_table.c.toughness])
+    if color:
+        table_columns.append(color_table.c.color_name)
+    if loyalty:
+        table_columns.append(loyalty_table.c.loyalty)
+    if text:
+        table_columns.append(text_table.c.text)
+
+    query = db.select(table_columns)
 
     # build the join chain to select from (based on what was passed in.
     join_chain = card_table
@@ -102,8 +113,21 @@ def get_info():
     res = __runquery(query)
     res = res.fetchall()
 
-    data_set = [dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name)
-                for name, type, rarity, artist, set_name in res]
+    # HACK: Nasty little stack hack.  Very much order dependent.
+    data_set = []
+    for name, type, rarity, artist, set_name, *extras in res:
+        new_rec = dict(name=name, type=type, rarity=rarity, artist=artist, set_name=set_name)
+        extras.reverse()
+        if power or toughness:
+            new_rec["power"] = extras.pop()
+            new_rec["toughness"] = extras.pop()
+        if color:
+            new_rec["color"] = extras.pop()
+        if loyalty:
+            new_rec["loyalty"] = str(extras.pop())
+        if text:
+            new_rec["text"] = extras.pop()
+        data_set.append(new_rec)
 
     app.logger.info("{} records retrieved.".format(len(data_set)))
     return jsonify({"results": data_set})
