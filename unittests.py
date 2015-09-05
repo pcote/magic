@@ -1,5 +1,5 @@
 from requests import get
-import nose
+import unittest
 """
 Nose-dependent unit tests for testing the web service calls.
 """
@@ -67,4 +67,4 @@ def test_text_search():
 
 
 if __name__ == '__main__':
-    nose.run()
+    unittest.main()
