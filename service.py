@@ -5,12 +5,13 @@ from flask import Flask, jsonify, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from configparser import ConfigParser
 import tabledefs
-
+import os
 
 app = Flask(__name__)
 
 parser = ConfigParser()
-parser.read("./creds.ini")
+cred_path = "/etc/magicws/creds.ini" if os.path.exists("/etc/magicws") else "./etc/creds.ini"
+parser.read(cred_path)
 user = parser.get("mysql", "user")
 pw = parser.get("mysql", "pw")
 db = parser.get("mysql", "db")

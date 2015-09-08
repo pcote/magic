@@ -8,7 +8,8 @@ Vagrant.configure(2) do |config|
   config.vm.network "forwarded_port", guest: 80, host: 80
 
   # config.vm.synced_folder "../data", "/vagrant_data"
-    config.vm.synced_folder ".", "/var/webapps/magic"
+    config.vm.synced_folder ".", "/var/webapps/magicws"
+    config.vm.synced_folder "./etc", "/etc/magicws"
 
   config.vm.provision "shell", inline: <<-SHELL
      function setup_web_server(){
