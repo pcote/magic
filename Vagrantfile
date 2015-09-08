@@ -8,6 +8,7 @@ Vagrant.configure(2) do |config|
   config.vm.network "forwarded_port", guest: 80, host: 80
 
   # config.vm.synced_folder "../data", "/vagrant_data"
+    config.vm.synced_folder ".", "/var/webapps/magic"
 
   config.vm.provision "shell", inline: <<-SHELL
      function setup_web_server(){
@@ -47,16 +48,16 @@ Vagrant.configure(2) do |config|
      }
 
      function start_web_service(){
-	    cd /vagrant
+	    cd /var/webapps/magic
 	    sudo service nginx restart
-        uwsgi --http-socket 127.0.0.1:9000 --module service:app --logto ./uwsgilog.log
+        uwsgi --http-socket 127.0.0.1:9000 --module service:app --logto ./uwsgilog.log &
      }
 
-     setup_web_server
-     setup_python
-     setup_security
-     setup_git
-     setup_database
+     #setup_web_server
+     #setup_python
+     #setup_security
+     #setup_git
+     #setup_database
      start_web_service
   SHELL
 end
