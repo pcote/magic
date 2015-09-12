@@ -40,7 +40,7 @@ function setup_web_server(){
 function start_web_service(){
    cd /var/webapps/magicws
    sudo service nginx restart
-   uwsgi --http-socket 127.0.0.1:9000 --module service:app --logto ./uwsgilog.log &
+   uwsgi --http-socket 127.0.0.1:9000 --module service:app --wsgi-file service.py  --logto ./uwsgilog.log &
 }
 
 setup_web_server
