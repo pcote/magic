@@ -39,7 +39,6 @@ function setup_web_server(){
 
 function start_web_service(){
    sudo cp /setup/magicws.conf /etc/init/magicws.conf
-   export PYTHONPATH=/var/webapps/magicws
    sudo service nginx restart
    sudo service magicws restart
 }
