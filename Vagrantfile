@@ -9,6 +9,8 @@ Vagrant.configure(2) do |config|
 
     config.vm.synced_folder ".", "/var/webapps/magicws"
     config.vm.synced_folder "./etc", "/etc/magicws"
+    config.vm.synced_folder "./setup", "/setup"
 
     config.vm.provision "shell", path: "provision.sh"
 end
+

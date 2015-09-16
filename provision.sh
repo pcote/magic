@@ -38,9 +38,10 @@ function setup_web_server(){
  }
 
 function start_web_service(){
+   sudo cp /setup/magicws.conf /etc/init/magicws.conf
    export PYTHONPATH=/var/webapps/magicws
    sudo service nginx restart
-   uwsgi --http-socket 127.0.0.1:9000 --module service:app --wsgi-file /var/webapps/magicws/service.py  --logto /var/log/magicws/uwsgilog.log &
+   sudo service magicws restart
 }
 
 setup_web_server
