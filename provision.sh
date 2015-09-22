@@ -5,7 +5,7 @@ function setup_web_server(){
      sudo apt-get install -y nginx
      sudo mkdir /var/log/magicws
      sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.old
-     sudo cp /var/webapps/magicws/nginx.conf /etc/nginx/nginx.conf
+     sudo cp /setup/nginx.conf /etc/nginx/nginx.conf
      sudo apt-get install -y build-essential
      sudo apt-get install -y python3-dev
      sudo apt-get install -y libssl-dev
@@ -14,12 +14,12 @@ function setup_web_server(){
 
  function setup_python(){
      sudo apt-get install -y python3-pip
-     sudo pip3 install -r /var/webapps/magicws/requirements.txt
+     sudo pip3 install -r /setup/requirements.txt
  }
 
  function setup_security(){
      sudo apt-get install -y fail2ban
-     sudo cp /var/webapps/magicws/jail.local /etc/fail2ban/jail.local
+     sudo cp /setup//jail.local /etc/fail2ban/jail.local
      # note: for now, ufw will need to be enabled manually.
      sudo ufw allow 80
      sudo ufw allow 3306
@@ -34,11 +34,20 @@ function setup_web_server(){
      sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password temporary_password'
      sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password temporary_password'
      sudo apt-get install -y mysql-server
-     mysql --user=root --password=temporary_password < /var/webapps/magicws/db_setup.sql
+     mysql --user=root --password=temporary_password < /setup/db_setup.sql
  }
 
 function start_web_service(){
    sudo cp /setup/magicws.conf /etc/init/magicws.conf
+
+   sudo mkdir /etc/magicws
+   sudo cp /setup/creds.ini /etc/magicws/
+
+   sudo mkdir /var/webapps/
+   sudo mkdir /var/webapps/magicws
+   sudo cp /setup/service.py /var/webapps/magicws/service.py
+   sudo cp /setup/service.py /var/webapps/magicws/tabledefs.py
+
    sudo service nginx restart
    sudo service magicws restart
 }

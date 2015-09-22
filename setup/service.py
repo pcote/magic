@@ -11,6 +11,7 @@ from setup import tabledefs
 
 
 app = Flask(__name__)
+app.debug=True
 
 parser = ConfigParser()
 cred_path = "/etc/magicws/creds.ini" if os.path.exists("/etc/magicws") else "./creds.ini"
