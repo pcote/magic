@@ -19,7 +19,7 @@ function setup_web_server(){
 
  function setup_security(){
      sudo apt-get install -y fail2ban
-     sudo cp /setup//jail.local /etc/fail2ban/jail.local
+     sudo cp /setup/jail.local /etc/fail2ban/jail.local
      # note: for now, ufw will need to be enabled manually.
      sudo ufw allow 80
      sudo ufw allow 3306
@@ -46,7 +46,7 @@ function start_web_service(){
    sudo mkdir /var/webapps/
    sudo mkdir /var/webapps/magicws
    sudo cp /setup/service.py /var/webapps/magicws/service.py
-   sudo cp /setup/service.py /var/webapps/magicws/tabledefs.py
+   sudo cp /setup/tabledefs.py /var/webapps/magicws/tabledefs.py
 
    sudo service nginx restart
    sudo service magicws restart
