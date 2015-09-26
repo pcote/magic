@@ -22,8 +22,8 @@ function setup_web_server(){
      sudo cp /setup/jail.local /etc/fail2ban/jail.local
      # note: for now, ufw will need to be enabled manually.
      sudo ufw allow 80
-     sudo ufw allow 3306
      sudo ufw allow 22
+     sudo ufw --force enable
  }
 
  function setup_git(){
