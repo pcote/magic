@@ -13,6 +13,6 @@ Before Running Provision.sh
 
 Important Manual Security Steps After Running Provision.sh
 ===========================================================
-1.)  Use the MySQL admin tool of your choice to connect to the MySQL server.  You'll want to create a SELECT only account and password for this user.
+1.)  Make a public user account for the magic database.  It should have a strong password and READ ONLY rights.
 2.)  Once you've created this new database user, update the user and password in the /etc/magicws/ directory.
 3.)  Restart the Magic WS service: "service magicws restart"
