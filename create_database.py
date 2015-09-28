@@ -1,8 +1,11 @@
 from operator import itemgetter
-# from service import json_data
 from sqlalchemy.sql import select, and_
 from sqlalchemy import MetaData, Table, Column, Text, Float, Integer, create_engine, VARCHAR, ForeignKey
 from configparser import ConfigParser
+import json
+
+with open("AllSets-x.json", encoding="utf-8") as fileob:
+    json_data = json.load(fileob)
 
 def lookup_card_id(conn, card):
     query = select([card_table.c.id]).where(and_(card_table.c.artist == card.get("artist"),
@@ -19,7 +22,6 @@ def lookup_card_id(conn, card):
 
 def populate_set_table(eng):
     conn = eng.connect()
-    from service import json_data
     getter = itemgetter(*"code name border releaseDate type".split())
     for key, val in json_data.items():
         code, name, border, releaseDate, type = getter(val)
@@ -29,13 +31,15 @@ def populate_set_table(eng):
 
 def populate_card_table(eng, all_cards):
     conn = eng.connect()
-    getter = itemgetter(*"artist type name imageName rarity layout set_code".split())
+    getter = itemgetter(*"artist type name imageName rarity layout jsonblob set_code".split())
     for card in all_cards:
-        artist, type, name, imageName, rarity, layout, set_code = getter(card)
+        artist, type, name, imageName, rarity, layout, jsonblob, set_code = getter(card)
         query = card_table.insert().values(artist=artist, type=type, name=name,
                                            imageName=imageName, rarity=rarity,
-                                           layout=layout, set_code=set_code)
+                                           layout=layout, jsonblob=jsonblob, set_code=set_code)
         conn.execute(query)
+
+
 
 
 def populate_strength_table(eng):
@@ -83,7 +87,7 @@ def populate_color_table(eng):
 
 if __name__ == '__main__':
     parser = ConfigParser()
-    parser.read("creds.ini")
+    parser.read("setup/creds.ini")
     user_name  = parser.get("mysql", "user")
     password = parser.get("mysql", "pw")
     db_name = parser.get("mysql", "db")
@@ -105,6 +109,7 @@ if __name__ == '__main__':
                        Column("imageName", Text),
                        Column("rarity", Text),
                        Column("layout", Text),
+                       Column("jsonblob", Text),
                        Column("set_code", VARCHAR(10), ForeignKey("card_set.code")))
 
     strength_table = Table("strength", meta,
@@ -132,14 +137,13 @@ if __name__ == '__main__':
 
 
     def generate_abridged_set():
-        from service import json_data
         getter = itemgetter(*"artist type name imageName rarity layout".split())
         for set_code, v in json_data.items():
             for card in v.get("cards"):
                 artist, type, name, imageName, rarity, layout = getter(card)
                 new_card = {"artist": artist, "type": type, "name": name,
                             "imageName": imageName, "rarity": rarity, "layout": layout,
-                            "set_code": set_code}
+                            "jsonblob": json.dumps(card), "set_code": set_code}
                 yield new_card
 
     def generate_abridged_index_set(eng):
@@ -153,7 +157,6 @@ if __name__ == '__main__':
         return new_card_set
 
     def cards_by_attr(attr_name):
-        from service import json_data
         for set_code, card_set in json_data.items():
             for card in card_set.get("cards"):
                 if attr_name in card:
